@@ -173,16 +173,16 @@ DlgPropertyLink::formatObject(App::Document* ownerDoc, App::DocumentObject* obj,
         if (obj->Label.getStrValue() == obj->getNameInDocument()) {
             return QLatin1String(objName);
         }
-        return QString::fromLatin1("%1 (%2)").arg(QLatin1String(objName),
+        return QStringLiteral("%1 (%2)").arg(QLatin1String(objName),
                                                   QString::fromUtf8(obj->Label.getValue()));
     }
 
     auto sobj = obj->getSubObject(sub);
     if (!sobj || sobj->Label.getStrValue() == sobj->getNameInDocument()) {
-        return QString::fromLatin1("%1.%2").arg(QLatin1String(objName), QString::fromUtf8(sub));
+        return QStringLiteral("%1.%2").arg(QLatin1String(objName), QString::fromUtf8(sub));
     }
 
-    return QString::fromLatin1("%1.%2 (%3)")
+    return QStringLiteral("%1.%2 (%3)")
         .arg(QLatin1String(objName),
              QString::fromUtf8(sub),
              QString::fromUtf8(sobj->Label.getValue()));
@@ -226,7 +226,7 @@ QString DlgPropertyLink::formatLinks(App::Document* ownerDoc, QList<App::SubObje
                 break;
             }
         }
-        return QString::fromLatin1("%1 [%2%3]")
+        return QStringLiteral("%1 [%2%3]")
             .arg(formatObject(ownerDoc, obj, nullptr),
                  list.join(QLatin1String(", ")),
                  QLatin1String(links.size() > 3 ? " ..." : ""));
@@ -239,7 +239,7 @@ QString DlgPropertyLink::formatLinks(App::Document* ownerDoc, QList<App::SubObje
             break;
         }
     }
-    return QString::fromLatin1("[%1%2]").arg(list.join(QLatin1String(", ")),
+    return QStringLiteral("[%1%2]").arg(list.join(QLatin1String(", ")),
                                              QLatin1String(links.size() > 3 ? " ..." : ""));
 }
 
@@ -289,15 +289,15 @@ void DlgPropertyLink::init(const App::DocumentObjectT& prop, bool tryFilter)
     std::vector<App::Document*> docs;
 
     singleSelect = false;
-    if (propLink->isDerivedFrom(App::PropertyXLinkSub::getClassTypeId())
-        || propLink->isDerivedFrom(App::PropertyLinkSub::getClassTypeId())) {
+    if (propLink->isDerivedFrom<App::PropertyXLinkSub>()
+        || propLink->isDerivedFrom<App::PropertyLinkSub>()) {
         allowSubObject = true;
         singleParent = true;
     }
-    else if (propLink->isDerivedFrom(App::PropertyLink::getClassTypeId())) {
+    else if (propLink->isDerivedFrom<App::PropertyLink>()) {
         singleSelect = true;
     }
-    else if (propLink->isDerivedFrom(App::PropertyLinkSubList::getClassTypeId())) {
+    else if (propLink->isDerivedFrom<App::PropertyLinkSubList>()) {
         allowSubObject = true;
     }
 
@@ -310,8 +310,8 @@ void DlgPropertyLink::init(const App::DocumentObjectT& prop, bool tryFilter)
     }
 
     bool isLinkList = false;
-    if (propLink->isDerivedFrom(App::PropertyXLinkList::getClassTypeId())
-        || propLink->isDerivedFrom(App::PropertyLinkList::getClassTypeId())) {
+    if (propLink->isDerivedFrom<App::PropertyXLinkList>()
+        || propLink->isDerivedFrom<App::PropertyLinkList>()) {
         isLinkList = true;
         allowSubObject = false;
     }
@@ -640,7 +640,7 @@ DlgPropertyLink::findItem(App::DocumentObject* obj, const char* subname, bool* p
     }
 
     std::vector<App::DocumentObject*> sobjs;
-    if (subname && subname[0]) {
+    if (!Base::Tools::isNullOrEmpty(subname)) {
         if (!allowSubObject) {
             obj = obj->getSubObject(subname);
             if (!obj) {

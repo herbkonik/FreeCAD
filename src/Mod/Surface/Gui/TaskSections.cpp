@@ -32,15 +32,17 @@
 #endif
 
 #include <App/Document.h>
+#include <Base/Tools.h>
 #include <Gui/Application.h>
 #include <Gui/BitmapFactory.h>
 #include <Gui/Command.h>
 #include <Gui/Control.h>
-#include <Gui/SelectionObject.h>
+#include <Gui/Selection/SelectionObject.h>
 #include <Gui/Widgets.h>
 #include <Mod/Part/Gui/ViewProvider.h>
 
 #include "TaskSections.h"
+
 #include "ui_TaskSections.h"
 
 
@@ -212,11 +214,11 @@ public:
         if (pObj == editedObject) {
             return false;
         }
-        if (!pObj->isDerivedFrom(Part::Feature::getClassTypeId())) {
+        if (!pObj->isDerivedFrom<Part::Feature>()) {
             return false;
         }
 
-        if (!sSubName || sSubName[0] == '\0') {
+        if (Base::Tools::isNullOrEmpty(sSubName)) {
             return false;
         }
 
@@ -326,8 +328,8 @@ void SectionsPanel::setEditedObject(Surface::Sections* fea)
         QListWidgetItem* item = new QListWidgetItem(ui->listSections);
         ui->listSections->addItem(item);
 
-        QString text = QString::fromLatin1("%1.%2").arg(QString::fromUtf8(obj->Label.getValue()),
-                                                        QString::fromStdString(edge));
+        QString text = QStringLiteral("%1.%2").arg(QString::fromUtf8(obj->Label.getValue()),
+                                                   QString::fromStdString(edge));
         item->setText(text);
 
         // The user data field of a list widget item
@@ -475,9 +477,9 @@ void SectionsPanel::onSelectionChanged(const Gui::SelectionChanges& msg)
             ui->listSections->addItem(item);
 
             Gui::SelectionObject sel(msg);
-            QString text = QString::fromLatin1("%1.%2").arg(
-                QString::fromUtf8(sel.getObject()->Label.getValue()),
-                QString::fromLatin1(msg.pSubName));
+            QString text =
+                QStringLiteral("%1.%2").arg(QString::fromUtf8(sel.getObject()->Label.getValue()),
+                                            QString::fromLatin1(msg.pSubName));
             item->setText(text);
 
             QList<QVariant> data;

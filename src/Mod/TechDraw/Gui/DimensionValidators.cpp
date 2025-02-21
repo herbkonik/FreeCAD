@@ -29,7 +29,7 @@
 
 #include <App/DocumentObject.h>
 #include <Base/Console.h>
-#include <Gui/Selection.h>
+#include <Gui/Selection/Selection.h>
 #include <Mod/Measure/App/ShapeFinder.h>
 #include <Mod/TechDraw/App/DrawViewPart.h>
 #include <Mod/TechDraw/App/ShapeExtractor.h>
@@ -54,10 +54,10 @@ TechDraw::DrawViewPart* TechDraw::getReferencesFromSelection(ReferenceVector& re
                                             allowOnlySingle);
 
     for (auto& selItem : selectionAll) {
-        if (selItem.getObject()->isDerivedFrom(TechDraw::DrawViewDimension::getClassTypeId())) {
+        if (selItem.getObject()->isDerivedFrom<TechDraw::DrawViewDimension>()) {
             //we are probably repairing a dimension, but we will check later
             dim = static_cast<TechDraw::DrawViewDimension*>(selItem.getObject());  //NOLINT cppcoreguidelines-pro-type-static-cast-downcast
-        } else if (selItem.getObject()->isDerivedFrom(TechDraw::DrawViewPart::getClassTypeId())) {
+        } else if (selItem.getObject()->isDerivedFrom<TechDraw::DrawViewPart>()) {
             //this could be a 2d geometry selection or just a DrawViewPart for context in
             //a 3d selection
             dvp = static_cast<TechDraw::DrawViewPart*>(selItem.getObject());  //NOLINT cppcoreguidelines-pro-type-static-cast-downcast
@@ -75,7 +75,7 @@ TechDraw::DrawViewPart* TechDraw::getReferencesFromSelection(ReferenceVector& re
                 ReferenceEntry ref(dvp, ShapeFinder::getLastTerm(sub));
                 references2d.push_back(ref);
             }
-        } else if (!selItem.getObject()->isDerivedFrom(TechDraw::DrawView::getClassTypeId())) {
+        } else if (!selItem.getObject()->isDerivedFrom<TechDraw::DrawView>()) {
             App::DocumentObject* obj3d = selItem.getObject();
             // this is a regular 3d reference in form obj + long subelement
             for (auto& sub3d : selItem.getSubNames()) {
@@ -379,7 +379,7 @@ DimensionGeometryType TechDraw::isValidSingleEdge(ReferenceEntry ref)
         return isInvalid;
     }
 
-    if (geom->getGeomType() == TechDraw::GENERIC) {
+    if (geom->getGeomType() == GeomType::GENERIC) {
         TechDraw::GenericPtr gen1 = std::static_pointer_cast<TechDraw::Generic>(geom);
         if (gen1->points.size() < 2) {
             return isInvalid;
@@ -392,11 +392,11 @@ DimensionGeometryType TechDraw::isValidSingleEdge(ReferenceEntry ref)
         } else {
             return TechDraw::isDiagonal;
         }
-    } else if (geom->getGeomType() == TechDraw::CIRCLE || geom->getGeomType() == TechDraw::ARCOFCIRCLE) {
+    } else if (geom->getGeomType() == GeomType::CIRCLE || geom->getGeomType() == GeomType::ARCOFCIRCLE) {
         return isCircle;
-    } else if (geom->getGeomType() == TechDraw::ELLIPSE || geom->getGeomType() == TechDraw::ARCOFELLIPSE) {
+    } else if (geom->getGeomType() == GeomType::ELLIPSE || geom->getGeomType() == GeomType::ARCOFELLIPSE) {
         return isEllipse;
-    } else if (geom->getGeomType() == TechDraw::BSPLINE) {
+    } else if (geom->getGeomType() == GeomType::BSPLINE) {
         TechDraw::BSplinePtr spline = std::static_pointer_cast<TechDraw::BSpline>(geom);
         if (spline->isCircle()) {
             return isBSplineCircle;
@@ -529,7 +529,7 @@ DimensionGeometryType TechDraw::isValidMultiEdge(ReferenceVector refs)
     TechDraw::BaseGeomPtr geom0 = objFeat0->getGeomByIndex(GeoId0);
     TechDraw::BaseGeomPtr geom1 = objFeat0->getGeomByIndex(GeoId1);
 
-    if (geom0->getGeomType() == TechDraw::GENERIC && geom1->getGeomType() == TechDraw::GENERIC) {
+    if (geom0->getGeomType() == GeomType::GENERIC && geom1->getGeomType() == GeomType::GENERIC) {
         TechDraw::GenericPtr gen0 = std::static_pointer_cast<TechDraw::Generic>(geom0);
         TechDraw::GenericPtr gen1 = std::static_pointer_cast<TechDraw::Generic>(geom1);
         if (gen0->points.size() > 2 || gen1->points.size() > 2) {//the edge is a polyline

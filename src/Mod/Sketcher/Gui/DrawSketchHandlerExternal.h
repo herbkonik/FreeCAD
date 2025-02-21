@@ -27,7 +27,7 @@
 #include <Mod/Part/App/DatumFeature.h>
 
 #include <Gui/Notifications.h>
-#include <Gui/SelectionFilter.h>
+#include <Gui/Selection/SelectionFilter.h>
 #include <Gui/Command.h>
 #include <Gui/CommandT.h>
 #include <Gui/View3DInventor.h>
@@ -97,7 +97,7 @@ public:
         // return false;
         //}
 
-        if (!sSubName || sSubName[0] == '\0') {
+        if (Base::Tools::isNullOrEmpty(sSubName)) {
             return false;
         }
         std::string element(sSubName);
@@ -219,10 +219,10 @@ private:
     QString getCrosshairCursorSVGName() const override
     {
         if (intersection) {
-            return QString::fromLatin1("Sketcher_Pointer_External_Intersection");
+            return QStringLiteral("Sketcher_Pointer_External_Intersection");
         }
 
-        return QString::fromLatin1("Sketcher_Pointer_External");
+        return QStringLiteral("Sketcher_Pointer_External");
     }
 
     void deactivated() override
